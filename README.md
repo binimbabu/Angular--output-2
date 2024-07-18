@@ -1,27 +1,82 @@
-# AngularOutput
+@Output
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.8.
+When child want to transmit a data to parent component we use @Output, here 'child' is the child component
 
-## Development server
+child.component.ts
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+export class ChildComponent {
+  @Output() sendDataEmitter: EventEmitter<any> = new EventEmitter();
 
-## Code scaffolding
+  sendData(){
+    this.sendDataEmitter.emit("Data from child component");
+  }
+}
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Build
+child.component.html
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+<button (click)="sendData()">Send Data</button>
 
-## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Running end-to-end tests
+app.component.html
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+<app-child (sendDataEmitter)="receiveData($event)"></app-child>
+<p> {{datatoParent}}</p>
 
-## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+here we pass the data through emitter  sendDataEmitter ( from child.component.ts to send data to parent) to a method in parent component ( i.e here receiveData($event) ) . Where $event will have the data from the child component which is passed to the method 'receiveData($event)' as a argument and this argument will be received in the parent component  ( that is app.component.ts) to variable datatoParent  .
+
+
+
+app.component.ts
+
+export class AppComponent {
+  datatoParent: any;
+  receiveData(childData: any) {
+    this.datatoParent = childData;
+  }
+}
+
+
+
+Another example
+
+child.component.ts
+
+export class ChildComponent {
+  dataModel:any;
+  @Output() sendDataEmitter: EventEmitter<any> = new EventEmitter();
+
+  sendData(){
+    this.sendDataEmitter.emit(this.dataModel);
+  }
+}
+
+
+EventEmitter will trigger when emit happens for the @output variable 'sendDataEmitter' and this sendDataEmitter will be passed to parent component that is app.component.html ( like <app-child (sendDataEmitter)="receiveData($event)"></app-child> )
+
+
+child.component.html
+
+
+<input type="text" placeholder="Enter data" [(ngModel)]="dataModel"/>
+<button (click)="sendData()">Send Data</button>
+
+
+app.component.html
+
+<app-child (sendDataEmitter)="receiveData($event)"></app-child>
+<p> {{datatoParent}}</p>
+
+
+app.component.ts
+
+export class AppComponent {
+  datatoParent: any;
+  receiveData(childData: any) {
+    this.datatoParent = childData;
+  }
+}
+
